@@ -52,6 +52,12 @@ prob2c:
 	@echo "USAGE: ./prob1c [TopImageName] [BaseImageName] 3 890 890"
 	./blend top_layer.raw blend.raw 3 890 890 bottom_layer.raw
 
+      ** Compile -- g++ Gaussian_Transform_RGB.cpp -o object
+      ** Run -- ./object forest_1.raw output.raw 1 960 600
+      
+      ** Compile -- g++ Gaussian_Transform_RGB.cpp -o object
+      ** Run -- ./object forest_2.raw output.raw 1 550 413
+
  clean:
 	rm -f *.o TF_approach CDF_approach DIGITAL_approach TF_hsl TF_rgb CDF_hsl CDF_rgb
 	rm -f tulip_dark_TF.raw tulip_bright_TF* tulip_mix_TF* tulip_dark_CDF* tulip_bright_CDF* tulip_mix_CDF* tulip_dark_DIGITAL* tulip_bright_DIGITAL* tulip_mix_DIGITAL* Image_Before_Equalization* Image_After_Equalization* Transfer_Function.csv output1.raw output2.raw output3.raw output4.raw Light_Unequalized.csv Light_Equalized.csv
