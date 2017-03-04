@@ -21,6 +21,7 @@
 P2)  HISTOGRAM EQUALIZATION 
 
 There is a makefile. Run the code from the terminal with the following command
+ 
 2)  
    (a)   make prob2a
    (b)   make prob2b

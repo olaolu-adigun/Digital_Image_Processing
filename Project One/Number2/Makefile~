@@ -1,0 +1,106 @@
+# EE569   Homework Assignment #1
+# Date:   Jan 20, 2017
+# Name:   Olaoluwa Adigun
+# ID:     2543-8895-69
+# Email:  adigun@usc.edu
+
+
+# Makefile for EE569 PA1
+# --- make clean
+# --- make prob2a
+# --- make prob2b
+# --- make prob2c
+#        
+# need to use make
+
+CC = gcc
+LN = gcc
+All : prob2a prob2b prob2c
+
+	
+prob2a:
+	@echo "****** Problem 2.a ******"
+	@g++ Mirror.cpp -o mirror
+	@g++ Resize.cpp -o resize
+	@g++ Composite.cpp -o composite
+	@echo "USAGE: ./prob1a [inputImageName] [outputImageName] 3 300 300"
+	./mirror dog.raw dog_mirror.raw 3 300 300
+	./resize dog.raw dog_resize1.raw 3 300 300 200 200
+	./resize dog.raw dog_resize2.raw 3 300 300 400 400
+	./resize dog.raw dog_resize3.raw 3 300 300 600 600
+	./composite beach.raw composite.raw 3 1914 808 dog_mirror.raw 300 300 400 110
+
+prob2b:
+	@echo "****** Problem 2.b ******"
+	@g++ CMYK_Color_Space.cpp -o cmyk
+	@g++ HSL_Color_Space.cpp -o hsl
+	@echo "USAGE: ./prob1b [inputName] 3 500 500"
+	@echo "Generate the output images"
+	./cmyk parrot.raw 3 512 384
+	./cmyk building.raw 3 789 600
+	./hsl cat.raw 3 600 398
+	./hsl dolphin.raw 3 640 480
+	./sephia beach.raw 3 1914 808
+
+prob2c:
+	@echo "****** Problem 2.c ******"
+	@g++ Blend.cpp -o blend
+	@echo "USAGE: ./prob1c [TopImageName] [BaseImageName] 3 890 890"
+	./blend top_layer.raw blend.raw 3 890 890 bottom_layer.raw
+
+  1). ** Compile -- g++ Transfer_Function_grayscale.cpp -o object
+      ** Run -- ./object tulip_dark.raw output.raw 1 400 366
+
+      ** Compile -- g++ Transfer_Function_grayscale.cpp -o object
+      ** Run -- ./object tulip_bright.raw output.raw 1 400 366
+
+      ** Compile -- g++ CDF_Approach_grayscale.cpp -o object
+      ** Run -- ./object tulip_dark.raw output.raw 1 400 366
+
+      ** Compile -- g++ CDF_Approach_grayscale.cpp -o object
+      ** Run -- ./object tulip_bright.raw output.raw 1 400 366
+
+
+  2). ** Compile -- g++ Transfer_Function_grayscale.cpp -o object
+      ** Run -- ./object tulip_mix.raw output.raw 1 400 366
+
+      ** Compile -- g++ CDF_Approach_grayscale.cpp -o object
+      ** Run -- ./object tulip_mix.raw output.raw 1 400 366
+
+      ** Compile -- g++ Digital_Implementation_grayscale.cpp -o object
+      ** Run -- ./object tulip_dark.raw output.raw 1 400 366
+
+      ** Compile -- g++ Digital_Implementation_grayscale.cpp -o object
+      ** Run -- ./object tulip_bright.raw output.raw 1 400 366
+
+      ** Compile -- g++ Digital_Implementation_grayscale.cpp -o object
+      ** Run -- ./object tulip_mix.raw output.raw 1 400 366
+
+(b) Histogram Equalization for Color Images.
+
+      ** Compile -- g++ Transfer_Function_RGB.cpp -o object
+      ** Run -- ./object bedroom.raw output.raw 1 940 400
+
+      ** Compile -- g++ CDF_Approach_RGB.cpp -o object
+      ** Run -- ./object bedroom.raw output.raw 1 940 400
+
+      ** Compile -- g++ Transfer_Function_HSL.cpp -o object
+      ** Run -- ./object bedroom.raw output.raw 1 940 400
+
+      ** Compile -- g++ CDF_Approach_HSL.cpp -o object
+      ** Run -- ./object bedroom.raw output.raw 1 940 400
+
+
+c). Histogram Transform
+
+      ** Compile -- g++ Gaussian_Transform_RGB.cpp -o object
+      ** Run -- ./object forest_1.raw output.raw 1 960 600
+      
+      ** Compile -- g++ Gaussian_Transform_RGB.cpp -o object
+      ** Run -- ./object forest_2.raw output.raw 1 550 413
+clean:
+	rm -f *.o prob1a prob1b prob1c mirror resize composite cmyk hsl sephia blend
+	rm -f dog_mirror.raw dog_resize1.raw dog_resize2.raw dog_resize3.raw composite* Cyan_building* Cyan_parrot* Magenta_parrot* Magenta_building* Yellow_building* Yellow_parrot* Hue_cat* Hue_dolphin* Saturation_cat* Saturation_dolphin* Lightness_cat* Lightness_dolphin* Sephia_beach.raw Grayscale_beach.raw blend.raw
+
+
+

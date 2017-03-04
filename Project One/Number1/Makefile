@@ -17,7 +17,6 @@ CC = gcc
 LN = gcc
 All : prob1a prob1b prob1c
 
-	
 prob1a:
 	@echo "****** Problem 1.a ******"
 	@g++ Mirror.cpp -o mirror
@@ -49,7 +48,7 @@ prob1c:
 	./blend top_layer.raw blend.raw 3 890 890 bottom_layer.raw
 
 clean:
-	rm -f *.o prob1a prob1b prob1c mirror resize composite cmyk hsl sephia blend
+	rm -f *.o mirror resize composite cmyk hsl sephia blend
 	rm -f dog_mirror.raw dog_resize1.raw dog_resize2.raw dog_resize3.raw composite* Cyan_building* Cyan_parrot* Magenta_parrot* Magenta_building* Yellow_building* Yellow_parrot* Hue_cat* Hue_dolphin* Saturation_cat* Saturation_dolphin* Lightness_cat* Lightness_dolphin* Sephia_beach.raw Grayscale_beach.raw blend.raw
 
 
