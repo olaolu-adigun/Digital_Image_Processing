@@ -17,30 +17,34 @@ CC = gcc
 LN = gcc
 All : prob2a prob2b prob2c
 
-	
 prob2a:
 	@echo "****** Problem 2.a ******"
-	@g++ Mirror.cpp -o mirror
-	@g++ Resize.cpp -o resize
-	@g++ Composite.cpp -o composite
+	@g++ Transfer_Function_grayscale.cpp -o TF_approach
+	@g++ CDF_Approach_grayscale.cpp -o CDF_approach
+	@g++ Digital_Implementation_grayscale.cpp -o DIGITAL_approach
 	@echo "USAGE: ./prob1a [inputImageName] [outputImageName] 3 300 300"
-	./mirror dog.raw dog_mirror.raw 3 300 300
-	./resize dog.raw dog_resize1.raw 3 300 300 200 200
-	./resize dog.raw dog_resize2.raw 3 300 300 400 400
-	./resize dog.raw dog_resize3.raw 3 300 300 600 600
-	./composite beach.raw composite.raw 3 1914 808 dog_mirror.raw 300 300 400 110
+	./TF_approach tulip_dark.raw tulip_dark_TF.raw 1 400 366
+	./TF_approach tulip_bright.raw tulip_bright_TF.raw 1 400 366
+	./TF_approach tulip_mix.raw tulip_mix_TF.raw 1 400 366
+	./CDF_approach tulip_dark.raw tulip_dark_CDF.raw 1 400 366
+	./CDF_approach tulip_bright.raw tulip_bright_CDF.raw 1 400 366
+	./CDF_approach tulip_mix.raw tulip_mix_CDF.raw 1 400 366
+	./DIGITAL_approach tulip_dark.raw tulip_dark_DIGITAL.raw 1 400 366
+	./DIGITAL_approach tulip_bright.raw tulip_bright_DIGITAL.raw 1 400 366
+	./DIGITAL_approach tulip_mix.raw tulip_mix_DIGITAL.raw 1 400 366
 
 prob2b:
 	@echo "****** Problem 2.b ******"
-	@g++ CMYK_Color_Space.cpp -o cmyk
-	@g++ HSL_Color_Space.cpp -o hsl
-	@echo "USAGE: ./prob1b [inputName] 3 500 500"
-	@echo "Generate the output images"
-	./cmyk parrot.raw 3 512 384
-	./cmyk building.raw 3 789 600
-	./hsl cat.raw 3 600 398
-	./hsl dolphin.raw 3 640 480
-	./sephia beach.raw 3 1914 808
+	@g++ Transfer_Function_RGB.cpp -o TF_rgb
+	@g++ CDF_Approach_RGB.cpp -o CDF_rgb
+	@g++ Transfer_Function_HSL.cpp -o TF_hsl
+	@g++ CDF_Approach_HSL.cpp -o CDF_hsl
+	@echo "USAGE: ./prob1b [inputName] [outputName] 3 500 500"
+	./TF_rgb bedroom.raw output1.raw 1 940 400
+	./CDF_rgb bedroom.raw output2.raw 1 940 400
+	./TF_hsl bedroom.raw output3.raw 1 940 400
+	./CDF_hsl bedroom.raw output4.raw 1 940 400
+
 
 prob2c:
 	@echo "****** Problem 2.c ******"
@@ -48,59 +52,6 @@ prob2c:
 	@echo "USAGE: ./prob1c [TopImageName] [BaseImageName] 3 890 890"
 	./blend top_layer.raw blend.raw 3 890 890 bottom_layer.raw
 
-  1). ** Compile -- g++ Transfer_Function_grayscale.cpp -o object
-      ** Run -- ./object tulip_dark.raw output.raw 1 400 366
-
-      ** Compile -- g++ Transfer_Function_grayscale.cpp -o object
-      ** Run -- ./object tulip_bright.raw output.raw 1 400 366
-
-      ** Compile -- g++ CDF_Approach_grayscale.cpp -o object
-      ** Run -- ./object tulip_dark.raw output.raw 1 400 366
-
-      ** Compile -- g++ CDF_Approach_grayscale.cpp -o object
-      ** Run -- ./object tulip_bright.raw output.raw 1 400 366
-
-
-  2). ** Compile -- g++ Transfer_Function_grayscale.cpp -o object
-      ** Run -- ./object tulip_mix.raw output.raw 1 400 366
-
-      ** Compile -- g++ CDF_Approach_grayscale.cpp -o object
-      ** Run -- ./object tulip_mix.raw output.raw 1 400 366
-
-      ** Compile -- g++ Digital_Implementation_grayscale.cpp -o object
-      ** Run -- ./object tulip_dark.raw output.raw 1 400 366
-
-      ** Compile -- g++ Digital_Implementation_grayscale.cpp -o object
-      ** Run -- ./object tulip_bright.raw output.raw 1 400 366
-
-      ** Compile -- g++ Digital_Implementation_grayscale.cpp -o object
-      ** Run -- ./object tulip_mix.raw output.raw 1 400 366
-
-(b) Histogram Equalization for Color Images.
-
-      ** Compile -- g++ Transfer_Function_RGB.cpp -o object
-      ** Run -- ./object bedroom.raw output.raw 1 940 400
-
-      ** Compile -- g++ CDF_Approach_RGB.cpp -o object
-      ** Run -- ./object bedroom.raw output.raw 1 940 400
-
-      ** Compile -- g++ Transfer_Function_HSL.cpp -o object
-      ** Run -- ./object bedroom.raw output.raw 1 940 400
-
-      ** Compile -- g++ CDF_Approach_HSL.cpp -o object
-      ** Run -- ./object bedroom.raw output.raw 1 940 400
-
-
-c). Histogram Transform
-
-      ** Compile -- g++ Gaussian_Transform_RGB.cpp -o object
-      ** Run -- ./object forest_1.raw output.raw 1 960 600
-      
-      ** Compile -- g++ Gaussian_Transform_RGB.cpp -o object
-      ** Run -- ./object forest_2.raw output.raw 1 550 413
-clean:
-	rm -f *.o prob1a prob1b prob1c mirror resize composite cmyk hsl sephia blend
-	rm -f dog_mirror.raw dog_resize1.raw dog_resize2.raw dog_resize3.raw composite* Cyan_building* Cyan_parrot* Magenta_parrot* Magenta_building* Yellow_building* Yellow_parrot* Hue_cat* Hue_dolphin* Saturation_cat* Saturation_dolphin* Lightness_cat* Lightness_dolphin* Sephia_beach.raw Grayscale_beach.raw blend.raw
-
-
-
+ clean:
+	rm -f *.o TF_approach CDF_approach DIGITAL_approach TF_hsl TF_rgb CDF_hsl CDF_rgb
+	rm -f tulip_dark_TF.raw tulip_bright_TF* tulip_mix_TF* tulip_dark_CDF* tulip_bright_CDF* tulip_mix_CDF* tulip_dark_DIGITAL* tulip_bright_DIGITAL* tulip_mix_DIGITAL* Image_Before_Equalization* Image_After_Equalization* Transfer_Function.csv output1.raw output2.raw output3.raw output4.raw Light_Unequalized.csv Light_Equalized.csv
