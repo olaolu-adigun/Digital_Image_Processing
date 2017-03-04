@@ -1,0 +1,32 @@
+1.Compiler and platform:
+   
+   I used C++ to implement the algorithms
+   I worked on Linux with gedit 
+   Image Viewer: http://rawpixels.net/
+
+2. How to run and compile 
+   Compile: Type g++ -o source_code.cpp object
+   Run: Type ./object input.raw output.raw 3 (for gray level image, type 1)  
+
+   NOTE: The instruction for compiling the codes varies depending on the question.
+	 Listed below are the instructions to compile and run the code. 
+
+
+*****************************************************************
+*****************************************************************
+**************  COMPILE AND RUN THE CODE         ****************
+*****************************************************************
+*****************************************************************
+
+P1)  BASIC IMAGE MANIPULATION.
+There is a makefile. Run the code from the terminal with the following command
+ 
+1)  
+   (a)   make prob1a
+   (b)   make prob1b
+   (c)   make prob1c
+	 make clean
+
+
+
+

@@ -1,0 +1,840 @@
+// EE569 Homework Assignment #2
+// Date:     
+// Name:     
+// ID:       
+// Email:    
+
+#include <typeinfo>
+#include "helper_fxn.h"
+
+using namespace std;
+
+// Default Constructor
+
+Image::Image() {
+	cout << "Load the image matrix" << endl;  
+}
+
+
+Image::Image(unsigned char*** arr, int Size1, int Size, int bytesPerPixel)
+{
+	arr2D = arr;
+	size1 = Size1;
+	size  = Size;
+	BytesPerPixel = bytesPerPixel;
+	//arr2D_aug = augment_arr(arr, size1, size, BytesPerPixel);
+}
+
+unsigned char*** Image:: Shrinking(){
+
+	// Augment
+	arr2D_aug = augment_arr();
+
+	// Convert to bool
+	bool*** arr2D_aug_bool = char_to_bool();
+	
+	//////////////////////START SHRINKING //////////////////////////////////
+	int iter = 0;
+	int count, check;
+	bool done, val, val1;
+	bool*** M = create_array(size1+2, size+2);
+	bool*** G = create_array(size1+2, size+2);
+	bool*** F = arr2D_aug_bool;
+	
+	
+	// Count the dots
+	count = dot_count (arr2D_aug_bool);
+	// Check if shrink is impossible
+	done = check_shrink (arr2D_aug_bool);
+	
+	cout << "***************START*****************"<<endl;
+	cout << "Size is: " << iter + 1 << ", Number of squares: " << count << endl;
+	
+	while(done != true){
+	
+	    
+	    iter = iter + 1;
+	    // Conditional Mask Pattern
+     	    for (int i = 1; i < size1+1 ; i++){
+	        for (int j = 1; j < size +1 ; j++){
+		    if (F[i][j][0] == true){	
+		    	M[i][j][0] = mask_pattern_shrink_conditional(F, i, j);
+		     }else{
+			M[i][j][0] = false;
+		     }
+	        }
+	    }
+	    
+	    //Unconditional Pattern Mask
+	    for (int i = 1; i < size1+1 ; i++){
+	        for (int j = 1; j < size+1 ; j++){
+		    val = M[i][j][0];
+		    val1 = mask_pattern_shrink_and_thin_unconditional(M, i, j);
+		    G[i][j][0] = (F[i][j][0] && (!val || val1));
+		    
+	        }
+	    }
+	    
+	    check = dot_count (G);
+
+	    if (check > count){
+		cout << "Size is: " << iter + 1 << ", Number of squares: " << check - count << endl;
+		count = check;
+	    }
+	
+	    done = check_shrink(G);
+	    F = G;
+	    
+	    //if (iter == 1){
+		//done = true;
+	    //}
+	    
+	    
+	}
+	
+	arr2D_aug = bool_to_char(G);
+	arr2D = remove_augment(arr2D_aug);
+	cout << endl;
+	cout << "Number of Iterations: "<< iter << endl; 
+	
+	return arr2D;
+
+}
+
+unsigned char*** Image:: Thinning(){
+
+	// Augment
+	arr2D_aug = augment_arr();
+
+	// Convert to bool
+	bool*** arr2D_aug_bool = char_to_bool();
+	
+	//////////////////////START THINNING //////////////////////////////////
+	int iter = 0;
+	int count, check;
+	bool val, val1;
+	bool*** M = create_array(size1+2, size+2);
+	bool*** G = create_array(size1+2, size+2);
+	bool*** F = arr2D_aug_bool;
+		
+	bool done = false;
+	cout << "***************START*****************"<<endl;
+
+	/**
+	for (int i = 1; i < size1+1 ; i++){
+	       for (int j = 1; j < size+1 ; j++){
+		    cout << F[i][j][0]<< " ";
+	        }
+		cout << endl;
+	}
+	cout << "iter: " << iter << endl;
+	**/
+	while(done != true){
+	    iter = iter + 1;
+
+	    // Conditional Mask Pattern
+     	    for (int i = 1; i < size1+1 ; i++){
+	        for (int j = 1; j < size +1 ; j++){
+		    if (F[i][j][0] == true){	
+		    	M[i][j][0] = mask_pattern_thin_conditional(F, i, j);
+		     }else{
+			M[i][j][0] = false;
+		     }
+	        }
+	    }
+	    
+	    //Unconditional Pattern Mask
+	    for (int i = 1; i < size1+1 ; i++){
+	        for (int j = 1; j < size+1 ; j++){
+		    val = M[i][j][0];
+		    val1 = mask_pattern_shrink_and_thin_unconditional(M, i, j);
+		    G[i][j][0] = (F[i][j][0] && (!val || val1));
+		    //cout << G[i][j][0]<< " ";
+	        }
+		//cout << endl;
+	    }
+	    //cout << "iter: " << iter << endl;
+	    cout <<  "iter: "<< iter << " " << check_thin(F,G) << endl;
+	    if (iter == 70){
+		done = true;
+	    }
+	    F = G;
+	}
+	
+	arr2D_aug = bool_to_char(G);
+	arr2D = remove_augment(arr2D_aug);
+	cout << endl;
+	cout << "Number of Iterations: "<< iter << endl; 
+	
+	return arr2D;
+
+}
+
+unsigned char*** Image:: Skeletonizing(){
+
+	// Augment
+	arr2D_aug = augment_arr();
+
+	// Convert to bool
+	bool*** arr2D_aug_bool = char_to_bool();
+	
+	//////////////////////START THINNING //////////////////////////////////
+	int iter = 0;
+	int count, check;
+	bool val, val1;
+	bool*** M = create_array(size1+2, size+2);
+	bool*** G = create_array(size1+2, size+2);
+	bool*** F = arr2D_aug_bool;
+		
+	bool done = false;
+	cout << "***************START*****************"<<endl;
+
+	/**
+	for (int i = 1; i < size1+1 ; i++){
+	       for (int j = 1; j < size+1 ; j++){
+		    cout << F[i][j][0]<< " ";
+	        }
+		cout << endl;
+	}
+	cout << "iter: " << iter << endl;
+	**/
+	while(done != true){
+	    iter = iter + 1;
+
+	    // Conditional Mask Pattern
+     	    for (int i = 1; i < size1+1 ; i++){
+	        for (int j = 1; j < size +1 ; j++){
+		    if (F[i][j][0] == true){	
+		    	M[i][j][0] = mask_pattern_skeleton_conditional(F, i, j);
+		     }else{
+			M[i][j][0] = false;
+		     }
+	        }
+	    }
+	    
+	    //Unconditional Pattern Mask
+	    for (int i = 1; i < size1+1 ; i++){
+	        for (int j = 1; j < size+1 ; j++){
+		    val = M[i][j][0];
+		    val1 = mask_pattern_skeletonize_unconditional(M, i, j);
+		    G[i][j][0] = (F[i][j][0] && (!val || val1));
+		    //cout << G[i][j][0]<< " ";
+	        }
+		//cout << endl;
+	    }
+	    //cout << "iter: " << iter << endl;
+	    //cout <<  "iter: "<< iter << " " << check_thin(F,G) << endl;
+	    if (iter == 70){
+		done = true;
+	    }
+	    F = G;
+	}
+	
+	arr2D_aug = bool_to_char(G);
+	arr2D = remove_augment(arr2D_aug);
+	cout << endl;
+	cout << "Number of Iterations: "<< iter << endl; 
+	
+	return arr2D;
+
+}
+
+unsigned char*** Image:: augment_arr(){
+	
+	unsigned char*** array = new unsigned char**[size1 + 2];
+
+	for (int i = 0; i < size1 + 2; i++){
+	    array[i] = new unsigned char*[size+2];
+	    for (int j = 0; j < size + 2; j++){
+	        array[i][j] = new unsigned char[BytesPerPixel];
+	    }
+	}
+
+	//Copy arr2D to the new augmented array
+	for (int i = 1; i < size1 + 1; i++){
+	    for (int j = 1; j < size + 1; j++){
+	       for (int k = 0;  k < BytesPerPixel; k++){
+		   array[i][j][k] = arr2D[i-1][j-1][k];
+	       }
+	    }
+	}
+
+	//Augment the rows
+	for (int i = 1; i < size1+1; i++){
+	    for (int k = 0; k < BytesPerPixel; k++){
+	        array[i][0][k] = char(0); 
+		array[i][size + 1][k] = char(0);
+	    }
+	}
+
+	//Augment the columns
+	for (int j = 0; j < size1 + 2; j++){
+	    for (int k = 0; k < BytesPerPixel; k++){
+	        array[0][j][k] = char(0); 
+		array[size1+1][j][k] = char(0);
+	    }
+	}
+	return array;
+}
+
+bool*** Image:: char_to_bool(){
+	
+	bool*** arrayB = new bool**[size+2];
+
+	for (int i = 0; i < size1+2; i++){
+	    arrayB[i] = new bool*[size+2];
+	    for (int j = 0; j < size + 2; j++){
+	        arrayB[i][j] = new bool[1];
+		if (int(arr2D_aug[i][j][0]) < 100){
+		    arrayB[i][j][0] = false;
+		}else{
+		    arrayB[i][j][0] = true;
+		}
+	     }
+	}
+	return arrayB;
+}
+
+unsigned char*** Image:: bool_to_char(bool*** arr){
+
+	unsigned char*** arrayC = new unsigned char**[size1+2];
+
+	for (int i = 0; i < size1+2; i++){
+	    arrayC[i] = new unsigned char*[size+2];
+	    for (int j = 0; j < size+2; j++){
+	        arrayC[i][j] = new unsigned char[BytesPerPixel];
+		for (int k = 0;  k < BytesPerPixel; k++){
+		   if (arr[i][j][k] == true){
+		      arrayC[i][j][k] = char(255);
+	 	   }
+		   else{
+		     arrayC[i][j][k] = char(0);
+		   }
+	        }
+	    }
+	}
+	return arrayC;
+}
+
+unsigned char*** Image::remove_augment(unsigned char*** arr){
+
+	unsigned char*** arrayC = new unsigned char**[size1];
+
+	for (int i = 0; i < size1; i++){
+	    arrayC[i] = new unsigned char*[size];
+	    for (int j = 0; j < size; j++){
+		arrayC[i][j] = new unsigned char[1];
+		arrayC[i][j][0] = arr[i+1][j+1][0];
+	    }
+	}
+	return arrayC;
+}
+
+
+bool Image:: mask_pattern_shrink_conditional(bool*** arr, int i, int j){
+
+	int Bytesnum = BytesPerPixel;
+	int val = compute_value(arr,i,j);
+	
+	// Bond 1 
+	if ((val == 128) || (val == 32) || (val == 8) || (val == 2)){
+	    return true;
+	} 
+
+	// Bond 2 
+	if ((val == 1) || (val == 64) || (val == 16) || (val == 4)){
+	    return true;
+	}
+
+	// Bond 3 
+	if ((val == 129) || (val == 192) || (val == 96) || (val == 48) || (val == 24) || (val == 12) || (val == 6) || (val == 3)){
+	    return true;
+	}
+
+	// Bond 4 
+	if ((val == 131) || (val == 224) || (val == 56) || (val == 14)){
+	    return true;
+	}
+
+	// Bond 5 
+	if ((val == 97) || (val == 67) || (val == 208) || (val == 133) || (val == 193) || (val == 112) || (val == 28) || (val == 7)){
+	    return true;
+	}
+
+	// Bond 6 
+	if ((val==99)||(val==216)||(val==225)||(val==195)||(val == 240)||(val == 120)||(val == 60)||(val == 30)||(val == 15)||(val == 135)){
+	    return true;
+	}
+
+	// Bond 7 
+	if ((val == 227)||(val == 248)||(val == 62)||(val == 143)){
+	    return true;
+	}
+
+	// Bond 8
+	if ((val == 199)|| (val == 241) || (val == 124) || (val == 31)){
+	    return true;
+	}
+
+	// Bond 9
+	if ((val == 231) || (val == 207) || (val == 249) || (val == 243) || (val == 252)||(val == 126)||(val == 63)||(val == 159)){
+	    return true;
+	}
+	// Bond 10
+	if ((val == 239)||(val == 251)||(val == 254)||(val == 191)){
+	    return true;
+	}
+	
+	return false;
+}
+
+
+bool Image:: mask_pattern_thin_conditional(bool*** arr, int i, int j){
+
+	int Bytesnum = BytesPerPixel;
+	int val = compute_value(arr,i,j);
+		
+	// Bond 4 
+	if ((val == 131) || (val == 224) || (val == 56) || (val == 14)){
+	    return true;
+	}
+	
+	if ((val == 65) || (val == 80) || (val == 20) || (val == 5)){
+	    return true;
+	}
+	
+	// Bond 5 
+	if ((val == 97) || (val == 67) || (val == 208) || (val == 133) || (val == 193) || (val == 112) || (val == 28) || (val == 7)){
+	    return true;
+	}
+	
+	// Bond 6 
+	if ((val==99)||(val==216)||(val==225)||(val==195)||(val==240)||(val==120)||(val==60)||(val==30)||(val==15)||(val==135)){
+	    return true;
+	}
+	
+	// Bond 7 
+	if ((val == 227)||(val == 248)||(val == 62)||(val == 143)){
+	    return true;
+	}
+	
+	// Bond 8
+	if ((val == 199)|| (val == 241) || (val == 124) || (val == 31)){
+	    //cout << " Bond 8 ";
+	    return true;
+	}
+
+	// Bond 9
+	if ((val == 231)||(val == 207)||(val == 249)||(val == 243)||(val == 252)||(val == 126)||(val == 63)||(val == 159)){
+	    return true;
+	}
+	
+	// Bond 10
+	if ((val == 239)||(val == 251)||(val == 254)||(val == 191)){
+	    return true;
+	}
+	
+	return false;
+}
+
+bool Image:: mask_pattern_skeleton_conditional(bool*** arr, int i, int j){
+
+	int Bytesnum = BytesPerPixel;
+	int val = compute_value(arr,i,j);
+	
+	// Bond 4 
+	if ((val == 131) || (val == 224) || (val == 56) || (val == 14)){
+	    return true;
+	}
+	
+	if ((val == 65) || (val == 80) || (val == 20) || (val == 5)){
+	    return true;
+	}
+
+	// Bond 6 
+	if ((val==225)||(val==195)||(val == 240)||(val == 120)||(val == 60)||(val == 30)||(val == 15)||(val == 135)){
+	    return true;
+	}
+
+	// Bond 7 
+	if ((val == 227)||(val == 248)||(val == 62)||(val == 143)){
+	    return true;
+	}
+
+	// Bond 8
+	if ((val == 199)|| (val == 241) || (val == 124) || (val == 31)){
+	    return true;
+	}
+
+	// Bond 9
+	if ((val == 231) || (val == 207) || (val == 249) || (val == 243) || (val == 252)||(val == 126)||(val == 63)||(val == 159)){
+	    return true;
+	}
+	// Bond 10
+	if ((val == 239)||(val == 251)||(val == 254)||(val == 191)){
+	    return true;
+	}
+	
+	// Bond 11
+	if ((val == 247)||(val == 253)||(val == 127)||(val == 223)){
+	    return true;
+	}
+	return false;
+}
+
+bool Image:: mask_pattern_shrink_and_thin_unconditional(bool*** arr, int i, int j){
+
+	
+	bool M = arr[i][j][0];
+	int val = compute_value(arr,i,j);
+	
+	//Spur
+	if ((M == false) &&(val == 0)){
+		
+		return true;
+	}
+	
+	if ((M == true) &&((val == 128)||(val == 32)|| (val == 4) || (val == 1))){
+		return true;
+	}
+	
+	// L Cluster
+	if ((M == true) &&((val == 129)||(val == 192)||(val== 96)||(val ==48)||(val == 24)||(val == 12)||(val == 6)||(val == 3))){
+		return true;
+	}
+	
+	// 4-Connected Offset
+	if ((M == true) &&((val == 208)||(val == 97)||(val == 67) || (val == 133))){
+		return true;
+	}
+	
+	// Spur Corner Cluster
+	if ((M == false) &&((val == 1)||(val == 64)||(val == 65))){
+		
+		return true;
+	}
+	if ((M == true) &&((val == 137)||(val == 200)||(val == 201))){
+		
+		return true;
+	}
+	if ((M == false) &&((val == 16)||(val == 64)||(val == 80))){
+		return true;
+	}
+	if ((M == true) &&((val == 50)||(val == 98)|(val == 114))){
+		return true;
+	}
+	if ((M == false) &&((val == 4)||(val == 16)||(val == 20))){
+		return true;
+	}
+	if ((M == true) &&((val == 140) ||(val == 152)||(val == 156))){
+		return true;
+	}
+	if ((M == false) &&((val == 1)||(val == 4)||(val == 5))){
+		return true;
+	}
+	if ((M == true) &&((val == 35)||(val == 38)||(val == 39))){
+		return true;
+	}
+	
+	// Corner Cluster
+	if ((M == false) &&((val == 0)||(val == 143))){
+		return true;
+	}
+	if ((M == true) &&((val == 112) ||(val == 255))){
+		return true;
+	}
+	
+	// Tee Branch
+	if ((M == false) &&((val == 40)||(val == 130)||(val == 160)||(val == 10))){
+		return true;
+	}
+	if ((M == true) &&((val == 211)||(val == 121)||(val == 151)||(val == 61))){
+		return true;
+	}
+	if ((M == true) &&((val == 229)||(val == 79)||(val == 94)||(val == 244))){
+		return true;
+	}
+	if ((M == true) &&((val == 69)||(val == 84)||(val == 81)||(val == 21))){
+		return true;
+	}
+	
+	// Vee Branch
+	if ( (arr[i-1][j-1][0] == arr[i][j][0]) && (arr[i-1][j+1][0] == arr[i][j][0]) && (arr[i-1][j-1][0] == arr[i-1][j+1][0])){
+		
+	    if ( (arr[i][j-1][0] == arr[i-1][j][0]) && (arr[i][j+1][0] == arr[i-1][j][0]) && (arr[i][j-1][0]== arr[i][j+1][0])){
+
+	       if ((arr[i+1][j-1][0] || arr[i+1][j][0])== true){
+		 
+		  return true;
+			
+	       }
+	    }
+	}
+
+
+	if ( (arr[i-1][j-1][0] == arr[i][j][0]) && (arr[i+1][j-1][0] == arr[i][j][0]) && (arr[i-1][j-1][0] == arr[i+1][j-1][0])){
+		
+	    if ( (arr[i-1][j][0] == arr[i][j-1][0]) && (arr[i+1][j][0] == arr[i-1][j][0]) && (arr[i][j-1][0]== arr[i+1][j][0])){
+
+	       if ((arr[i][j+1][0] || arr[i+1][j+1][0])== true){
+		 
+		  return true;
+			
+	       }
+	    }
+	}
+
+	if ( (arr[i+1][j-1][0] == arr[i][j][0]) && (arr[i+1][j+1][0] == arr[i][j][0]) && (arr[i+1][j+1][0] == arr[i+1][j-1][0])){
+		
+	    if ( (arr[i][j-1][0] == arr[i+1][j][0]) && (arr[i][j+1][0] == arr[i+1][j][0]) && (arr[i][j-1][0]== arr[i][j+1][0])){
+
+	       if ((arr[i-1][j+1][0] || arr[i-1][j][0])== true){
+		 
+		  return true;
+			
+	       }
+	    }
+	}
+
+	if ( (arr[i-1][j+1][0] == arr[i][j][0]) && (arr[i+1][j+1][0] == arr[i][j][0]) && (arr[i-1][j+1][0] == arr[i+1][j+1][0])){
+		
+	    if ( (arr[i-1][j][0] == arr[i][j+1][0]) && (arr[i+1][j][0] == arr[i][j+1][0]) && (arr[i-1][j][0]== arr[i+1][j][0])){
+
+	       if ((arr[i-1][j-1][0] || arr[i][j-1][0])== true){
+		 
+		  return true;
+			
+	       }
+	    }
+	}
+	
+	// Diagonal Branch
+	if ((M == false) &&(val == 34|| val == 136)){
+		return true;
+	}
+	if ((M == true) &&(val == 73 || val == 82 || val == 148 || val == 37)){
+		return true;
+	}
+	if ((M == true) &&(val == 107 || val == 218 || val == 182 || val == 173)){
+		return true;
+	}	
+	//**
+	if  ((M==true) && ((val==241)||(val==112))){
+		return true;
+	}
+	return false;
+
+}
+
+
+int Image:: dot_count (bool*** arr){
+
+	int count = 0;
+	int val;
+
+	for (int i = 1; i < size1 + 1; i++){
+	    for (int j = 1; j < size + 1; j++){
+	        if  (arr[i][j][0] == true){
+		    val = compute_value(arr,i, j);
+		    if  (val == 0){
+		        count  = count + 1;
+		    }	
+	        }
+	    }
+	}
+	return count;
+}
+
+
+bool Image:: mask_pattern_skeletonize_unconditional(bool*** arr, int i, int j){
+
+	
+	bool M = arr[i][j][0];
+	int val = compute_value(arr,i,j);
+	
+	//Spur
+	if ((M == false) &&(val == 0)){
+		return true;
+	}
+	
+	if ((M == true) &&((val == 128)||(val == 32)|| (val == 8) || (val == 2))){
+		return true;
+	}
+
+	// Single 4-Connected
+	if ((M == true) &&((val == 64)||(val == 16)|| (val == 4) || (val == 1))){
+		return true;
+	}
+	
+	// L Corner
+	if ((M == true) &&((val == 65)||(val == 80)||(val== 5)||(val ==20))){
+		return true;
+	}
+	
+	// Corner-Cluster
+	if ((M == true) &&((val == 112)||(val == 143)||(val == 255))){
+		return true;
+	}
+	if ((M == true) &&((val == 7)||(val == 248)||(val == 255))){
+		return true;
+	}
+	
+	// Tee Branch
+	if ((M == false) &&((val == 174)||(val == 171)||(val == 234)||(val == 186))){
+		return true;
+	}
+	if ((M == true) &&((val == 81)||(val == 84)||(val == 21)||(val == 69))){
+		return true;
+	}
+	if ((M == true) &&(val == 255)){
+		return true;
+	
+	// Vee Branch
+	if ( (arr[i-1][j-1][0] == arr[i][j][0]) && (arr[i-1][j+1][0] == arr[i][j][0]) && (arr[i-1][j-1][0] == arr[i-1][j+1][0])){
+		
+	    if ( (arr[i][j-1][0] == arr[i-1][j][0]) && (arr[i][j+1][0] == arr[i-1][j][0]) && (arr[i][j-1][0]== arr[i][j+1][0])){
+
+	       if ((arr[i+1][j-1][0] || arr[i+1][j][0] || arr[i+1][j+1][0] )== true){
+		 
+		  return true;
+			
+	       }
+	    }
+	}
+
+
+	if ( (arr[i-1][j-1][0] == arr[i][j][0]) && (arr[i+1][j-1][0] == arr[i][j][0]) && (arr[i-1][j-1][0] == arr[i+1][j-1][0])){
+		
+	    if ( (arr[i-1][j][0] == arr[i][j-1][0]) && (arr[i+1][j][0] == arr[i-1][j][0]) && (arr[i][j-1][0]== arr[i+1][j][0])){
+
+	       if ((arr[i][j+1][0] || arr[i+1][j+1][0] || arr[i-1][j+1][0])== true){
+		 
+		  return true;
+			
+	       }
+	    }
+	}
+
+	if ( (arr[i+1][j-1][0] == arr[i][j][0]) && (arr[i+1][j+1][0] == arr[i][j][0]) && (arr[i+1][j+1][0] == arr[i+1][j-1][0])){
+		
+	    if ( (arr[i][j-1][0] == arr[i+1][j][0]) && (arr[i][j+1][0] == arr[i+1][j][0]) && (arr[i][j-1][0]== arr[i][j+1][0])){
+
+	       if ((arr[i-1][j+1][0] || arr[i-1][j][0] || arr[i-1][j-1][0])== true){
+		 
+		  return true;
+			
+	       }
+	    }
+	}
+
+	if ( (arr[i-1][j+1][0] == arr[i][j][0]) && (arr[i+1][j+1][0] == arr[i][j][0]) && (arr[i-1][j+1][0] == arr[i+1][j+1][0])){
+		
+	    if ( (arr[i-1][j][0] == arr[i][j+1][0]) && (arr[i+1][j][0] == arr[i][j+1][0]) && (arr[i-1][j][0]== arr[i+1][j][0])){
+
+	       if ((arr[i-1][j-1][0] || arr[i][j-1][0] || arr[i+1][j-1][0])== true){
+		  return true;			
+	       }
+	    }
+	}
+	
+	// Diagonal Branch
+	if ((M == false) &&(val == 34|| val == 136)){
+		return true;
+	}
+	if ((M == true) &&(val == 73 || val == 82 || val == 148 || val == 37)){
+		return true;
+	}
+	if ((M == true) &&(val == 107 || val == 218 || val == 182 || val == 173)){
+		return true;
+	}	
+	//**
+	if  ((M==true) && ((val==241)||(val==112))){
+		return true;
+	}
+	return false;
+
+}
+
+
+bool Image:: check_shrink(bool*** arr){
+
+	int val;
+	for (int i = 1; i < size1 + 1; i++){
+	    for (int j = 1; j < size + 1; j++){
+	        if  (arr[i][j][0] == true){
+		    val = compute_value(arr,i, j);
+		    if (val != 0){
+		        return false;
+		    }	
+	        }
+	    }
+	}
+	return true;
+}
+
+
+bool Image:: check_thin (bool*** arr_before, bool*** arr_after){
+
+	for (int i = 1; i < size1 + 2; i++){
+	    for (int j = 1; j < size + 2; j++){
+	        if (arr_before[i][j][0] != arr_after[i][j][0]){
+		   return false;
+		}
+	    }
+	}
+	return true;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////HELPER FUNCTIONS////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int compute_value(bool*** arr, int i, int j){
+
+	//int arr1D [8];
+	int val = 0;
+
+	if (arr[i][j+1][0] == true){
+		val = val + 1;
+	} 
+	if (arr[i+1][j+1][0] == true){
+		val = val + 2;
+	} 
+	if (arr[i+1][j][0] == true){
+		val = val + 4;
+	} 
+	if (arr[i+1][j-1][0] == true){
+		val = val + 8;	
+	} 
+	if (arr[i][j-1][0] == true){
+		val = val + 16;
+	} 
+	if (arr[i-1][j-1][0] == true){
+		val = val + 32;
+	} 
+	if (arr[i-1][j][0] == true){
+		val = val + 64;
+	} 
+	if (arr[i-1][j+1][0] == true){
+		val = val + 128;
+	}
+	//cout << val << endl ;
+	return val;
+}
+
+
+bool*** create_array(int row, int col){
+	bool*** arr = new bool**[row];
+
+	for (int i = 0; i < row; i++){
+	    arr[i] = new bool*[col];
+	    for (int j = 0; j < col;  j++){
+	        arr[i][j] = new bool[1];
+	        arr[i][j][0] = false;
+	    }
+	}
+
+	return arr;
+}
+
